@@ -15,14 +15,16 @@ class AuditRequest(BaseModel):
     url: str
 
 
-@app.post("/api/audit")
-async def run_audit(req: AuditRequest):
+# Vercel may pass the function a rewritten path (e.g. /api/index) instead of
+# /api/audit, so these handlers accept any path rather than one fixed route.
+@app.post("/{full_path:path}")
+async def run_audit(full_path: str, req: AuditRequest):
     try:
         return await audit(req.url)
     except AuditError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/api/health")
-async def health():
-    return {"ok": True}
+@app.get("/{full_path:path}")
+async def health(full_path: str):
+    return {"ok": True, "path": "/" + full_path}
