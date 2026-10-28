@@ -1,56 +1,56 @@
-# SEO · AEO · GEO Audit Tool
+# SEO · AEO · GEO · Agent Readiness Audit
 
-Paste a URL, get a three-part report (SEO, AEO, GEO) with scores and copy-paste fixes.
+Paste a URL, get a report with scores and copy-paste fixes across six areas.
 No API key needed: checks are rule-based and fixes are generated from the page's own content.
+
+## Tabs
+
+| Tab | What it covers |
+|---|---|
+| **SEO** | On-page and technical SEO: title, meta, canonical, H1, headings, alt text, HTTPS, viewport, OG, noindex and X-Robots-Tag, sitemap, robots.txt, redirects, JSON-LD validity, hreflang, favicon, page size, compression |
+| **AEO** | FAQPage/HowTo schema, question headings, ≤60-word direct answers, lists/tables, freshness |
+| **GEO** | AI crawler access, llms.txt, Organization + sameAs, author/E-E-A-T, fact density, content without JavaScript, trust pages |
+| **Agent** | WebMCP/NLWeb signals, open to agents, labelled form fields, named buttons, real controls, CAPTCHA, feeds/agent card, forms without JS |
+| **UX** | CTA, headline clarity, contact route, form length, social proof, render-blocking scripts, image dimensions, lazy loading, readability, scannability |
+| **Commerce** | Shown only when a store is detected: Product schema, offer (price/currency/availability), reviews, SKU/GTIN/brand, return and shipping data, price consistency, policy links |
+
+Not measured: off-page SEO (backlinks need a link-data API), Core Web Vitals, JavaScript-rendered content, real conversion data.
+WebMCP, NLWeb and agent cards are emerging standards, so those checks only warn.
 
 ## Project layout
 
 ```
-api/index.py      FastAPI app (Vercel serverless function)
-api/auditor.py    Audit engine
-public/index.html Frontend (served statically at /)
-vercel.json       Routes + function timeout
-requirements.txt  Python dependencies
+api/index.py     FastAPI app (Vercel serverless function, catch-all route)
+api/auditor.py   Core engine: SEO, AEO, GEO checks, scoring
+api/extras.py    Technical SEO extras, Agent, Commerce, UX checks
+public/index.html Frontend
+vercel.json      Function timeout
+requirements.txt Dependencies
 ```
 
-## Run locally (UI + API together)
+## Run locally
 
 ```bash
 npm i -g vercel
-vercel dev        # open http://localhost:3000
+vercel dev        # UI + API at http://localhost:3000
 ```
 
-Or run just the API with Python:
+or API only:
 
 ```bash
-python3 -m venv venv && source venv/bin/activate     # Windows: venv\Scripts\Activate.ps1
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-uvicorn api.index:app --reload                       # API at http://localhost:8000
+uvicorn api.index:app --reload
 ```
 
-## Deploy to Vercel
+## Deploy
 
-### Option A: Vercel CLI
 ```bash
-npm i -g vercel
-vercel login
-vercel            # first run: preview deployment (answer the prompts, accept defaults)
-vercel --prod     # production deployment
+git add . && git commit -m "Add agent, UX and commerce audits" && git push
 ```
-
-### Option B: GitHub (auto-deploys on every push)
-```bash
-git init && git add . && git commit -m "SEO AEO GEO audit tool"
-git branch -M main
-git remote add origin https://github.com/<you>/<repo>.git
-git push -u origin main
-```
-Then on vercel.com: **Add New → Project → Import** the repo → **Deploy** (no settings to change).
+Vercel redeploys automatically from GitHub.
 
 ## Notes
 
-- Function timeout is set to 30s in `vercel.json` (Hobby plan allows up to 60s).
-- Private, loopback and link-local addresses are blocked (SSRF), including after redirects.
-  For local testing against localhost only, set `ALLOW_PRIVATE=1`.
-- Audits the initial HTML only (no JavaScript rendering) and does not measure Core Web Vitals.
-- Add rate limiting (e.g. Vercel WAF rules or Upstash) before sharing the public URL widely.
+- Private, loopback and link-local addresses are blocked (SSRF). For local tests only: `ALLOW_PRIVATE=1`.
+- Add rate limiting before sharing the public URL widely.

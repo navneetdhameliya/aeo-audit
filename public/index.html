@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SEO · AEO · GEO Audit</title>
+<title>SEO · AEO · GEO · Agent Readiness Audit</title>
+<meta name="description" content="Paste a URL and get a free audit across SEO, AEO, GEO, agent readiness, CRO/UX and agentic commerce, with copy-paste fixes.">
 <style>
   :root{--bg:#0f1115;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#8b93a7;--pass:#34d399;--warn:#fbbf24;--fail:#f87171;--accent:#7c9cff}
   @media (prefers-color-scheme:light){:root{--bg:#f6f7fb;--panel:#fff;--line:#e3e6ee;--text:#151821;--mute:#5d667c;--accent:#3b5bdb}}
@@ -13,19 +14,21 @@
   h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}
   .sub{color:var(--mute);margin:0 0 24px}
   form{display:flex;gap:8px}
-  input{flex:1;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:16px}
+  input{flex:1;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:16px;min-width:0}
   button{cursor:pointer;border:0;border-radius:10px;padding:0 22px;background:var(--accent);color:#fff;font-weight:600;font-size:15px}
   button:disabled{opacity:.6;cursor:wait}
   .err{margin-top:14px;color:var(--fail)}
   #report{display:none;margin-top:32px}
-  .meta{color:var(--mute);font-size:13px;word-break:break-all;margin-bottom:16px}
-  .scores{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-  .score{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
-  .score b{display:block;font-size:34px;line-height:1.1}
-  .score span{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px}
-  .tab{background:none;color:var(--mute);padding:10px 16px;border-radius:8px 8px 0 0;border-bottom:2px solid transparent}
+  .meta{color:var(--mute);font-size:13px;word-break:break-all;margin-bottom:6px}
+  .store{display:inline-block;font-size:12px;color:var(--accent);margin-bottom:14px}
+  .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px;margin-bottom:20px}
+  .score{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center}
+  .score b{display:block;font-size:32px;line-height:1.1}
+  .score span{color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+  .tab{background:none;color:var(--mute);padding:10px 14px;border-radius:8px 8px 0 0;border-bottom:2px solid transparent;white-space:nowrap}
   .tab.on{color:var(--text);border-color:var(--accent)}
+  .hint{color:var(--mute);font-size:13px;margin:0 0 12px}
   .item{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
   .item.pass{border-left-color:var(--pass)}.item.warn{border-left-color:var(--warn)}.item.fail{border-left-color:var(--fail)}
   .item h3{margin:0 0 4px;font-size:15px;display:flex;justify-content:space-between;gap:8px}
@@ -36,17 +39,23 @@
   .code{position:relative;margin-top:8px}
   pre{margin:0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;overflow:auto;font-size:12.5px;max-height:260px}
   .copy{position:absolute;top:6px;right:6px;padding:4px 10px;font-size:12px;background:var(--line);color:var(--text)}
-  .actions{margin-top:20px;display:flex;gap:8px}
+  .actions{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
   .actions button{padding:10px 16px;background:var(--panel);color:var(--text);border:1px solid var(--line)}
   .note{color:var(--mute);font-size:12px;margin-top:14px}
-  @media (max-width:600px){.scores{grid-template-columns:repeat(2,1fr)}form{flex-direction:column}button{padding:12px}}
-  @media print{.tabs,form,.actions,.copy{display:none}.panelwrap>div{display:block!important}body{background:#fff;color:#000}}
+  details{margin-top:36px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+  summary{cursor:pointer;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
+  td,th{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+  th{color:var(--mute);font-weight:600;border-top:0}
+  td:first-child{font-weight:600;white-space:nowrap}
+  @media (max-width:600px){form{flex-direction:column}button{padding:12px}}
+  @media print{.tabs,form,.actions,.copy,details{display:none}.panelwrap>div{display:block!important}body{background:#fff;color:#000}}
 </style>
 </head>
 <body>
 <main>
-  <h1>SEO · AEO · GEO Audit</h1>
-  <p class="sub">Paste a URL. Get a three-part report with fixes you can copy straight into your site.</p>
+  <h1>SEO · AEO · GEO · Agent Audit</h1>
+  <p class="sub">Paste a URL. Get a report across search, AI answers, agent readiness, UX and (for stores) agentic commerce, with fixes you can copy straight into your site.</p>
   <form id="f">
     <input id="u" placeholder="example.com or https://example.com/page" autocomplete="off" required>
     <button id="go">Run audit</button>
@@ -55,6 +64,7 @@
 
   <section id="report">
     <div class="meta" id="meta"></div>
+    <div class="store" id="store"></div>
     <div class="scores" id="scores"></div>
     <div class="tabs" id="tabs"></div>
     <div class="panelwrap" id="panels"></div>
@@ -64,11 +74,34 @@
     </div>
     <p class="note" id="note"></p>
   </section>
+
+  <details>
+    <summary>What do SEO, AEO, GEO and the other terms mean?</summary>
+    <table>
+      <tr><th>Term</th><th>Stands for</th><th>Goal</th></tr>
+      <tr><td>SEO</td><td>Search Engine Optimization</td><td>Organic visibility in search engines</td></tr>
+      <tr><td>Technical SEO</td><td>Search infrastructure</td><td>Crawling, indexing, rendering, page technology</td></tr>
+      <tr><td>On-Page SEO</td><td>Page-level optimization</td><td>HTML, content, headings, internal relevance</td></tr>
+      <tr><td>Off-Page SEO</td><td>External reputation</td><td>Editorial links, coverage, brand recognition (not measured here)</td></tr>
+      <tr><td>AEO</td><td>Answer Engine Optimization</td><td>Making information useful for answer-oriented search</td></tr>
+      <tr><td>GEO / LLMO</td><td>Generative Engine / LLM Optimization</td><td>Visibility and citation in AI-generated answers</td></tr>
+      <tr><td>Agent readiness</td><td>Agentic web</td><td>Letting AI agents read your site and act on it (forms, tools, access)</td></tr>
+      <tr><td>Agentic commerce</td><td>AI-assisted shopping</td><td>Product data agents can read, compare and recommend</td></tr>
+      <tr><td>CRO / SXO</td><td>Conversion / Search Experience Optimization</td><td>Turning visitors into actions; connecting relevance, usability and conversion</td></tr>
+      <tr><td>ASO</td><td>App Store Optimization</td><td>Visibility inside app stores (apps only)</td></tr>
+    </table>
+  </details>
 </main>
 <script>
 const $ = id => document.getElementById(id);
-const LABELS = {seo:"SEO", aeo:"AEO", geo:"GEO"};
-const SUB = {seo:"Search engines", aeo:"Answer engines", geo:"Generative engines"};
+const META = {
+  seo:{label:"SEO", name:"SEO · Search engines", hint:"On-page and technical SEO: how search engines crawl, index and rank the page."},
+  aeo:{label:"AEO", name:"AEO · Answer engines", hint:"How easily the page can be quoted as a direct answer."},
+  geo:{label:"GEO", name:"GEO · Generative engines", hint:"Whether AI engines can access, trust and cite the brand."},
+  agent:{label:"Agent", name:"Agent readiness", hint:"Whether an AI agent can understand the page and act on it. Several of these standards are still emerging, so a warning is not a failure."},
+  ux:{label:"UX", name:"CRO / UX", hint:"Signals that affect whether visitors take action. Real conversion data needs analytics."},
+  commerce:{label:"Commerce", name:"Agentic commerce", hint:"Product data that shopping agents need to read, compare and recommend your products."}
+};
 let data = null;
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -89,14 +122,17 @@ $("f").addEventListener("submit", async e => {
 function render(d){
   $("report").style.display = "block";
   $("meta").textContent = d.url + (d.title ? " — " + d.title : "");
-  const s = d.scores;
-  $("scores").innerHTML = [["overall","Overall"],["seo","SEO"],["aeo","AEO"],["geo","GEO"]].map(([k,l]) =>
+  $("store").textContent = d.store && d.store.detected
+    ? "Online store detected" + (d.store.platform ? " (" + d.store.platform + ")" : "") + ": agentic commerce checks included."
+    : "";
+  const s = d.scores, P = d.pillars;
+  $("scores").innerHTML = [["overall","Overall"], ...P.map(k=>[k, META[k].label])].map(([k,l]) =>
     `<div class="score"><b style="color:${color(s[k])}">${s[k]}</b><span>${l}</span></div>`).join("");
-  $("tabs").innerHTML = ["seo","aeo","geo"].map((k,i)=>`<button class="tab ${i?"":"on"}" data-k="${k}">${LABELS[k]} · ${SUB[k]}</button>`).join("");
-  $("panels").innerHTML = ["seo","aeo","geo"].map((k,i)=>{
+  $("tabs").innerHTML = P.map((k,i)=>`<button class="tab ${i?"":"on"}" data-k="${k}">${META[k].label}</button>`).join("");
+  $("panels").innerHTML = P.map((k,i)=>{
     const order = {fail:0,warn:1,pass:2};
     const items = d.checks.filter(c=>c.pillar===k).sort((a,b)=>order[a.status]-order[b.status]||b.weight-a.weight);
-    return `<div data-p="${k}" style="display:${i?"none":"block"}">${items.map(item).join("")}</div>`;
+    return `<div data-p="${k}" style="display:${i?"none":"block"}"><p class="hint"><b>${META[k].name}.</b> ${META[k].hint}</p>${items.map(item).join("")}</div>`;
   }).join("");
   $("note").textContent = d.notes + ` ${d.summary.pass} passed, ${d.summary.warn} warnings, ${d.summary.fail} failed.`;
   document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{

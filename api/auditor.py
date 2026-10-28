@@ -15,6 +15,8 @@ from urllib.parse import urljoin, urlparse
 import httpx
 from bs4 import BeautifulSoup
 
+import extras
+
 UA = "Mozilla/5.0 (compatible; AEOAuditBot/1.0)"
 AI_BOTS = [
     "GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "anthropic-ai",
@@ -182,9 +184,10 @@ async def audit(raw_url: str) -> dict:
     async with httpx.AsyncClient(
         follow_redirects=True, timeout=8.0, headers={"User-Agent": UA}
     ) as client:
-        page, robots, llms, sitemap = await asyncio.gather(
+        page, robots, llms, sitemap, card = await asyncio.gather(
             _get(client, url), _get(client, f"{base}/robots.txt"),
             _get(client, f"{base}/llms.txt"), _get(client, f"{base}/sitemap.xml"),
+            _get(client, f"{base}/.well-known/agent-card.json"),
         )
 
     if page is None:
@@ -481,11 +484,40 @@ async def audit(raw_url: str) -> dict:
               "About/Contact links found." if about else "No About or Contact link.",
               "" if about else "Link clear About and Contact pages; they help engines verify the entity behind the content."))
 
-    scores = {k: score(checks, k) for k in ("seo", "aeo", "geo")}
-    scores["overall"] = round(sum(scores.values()) / 3)
+    # ------------- extra pillars: technical SEO, agent readiness, commerce, UX -------------
+    full = BeautifulSoup(page.text, "html.parser")
+    for t in full(["script", "style", "noscript"]):
+        t.decompose()
+    ld_scripts = soup.find_all("script", type="application/ld+json")
+    ld_errors = 0
+    for s in ld_scripts:
+        try:
+            json.loads(s.string or s.get_text() or "")
+        except Exception:
+            ld_errors += 1
+    card_ok = bool(card is not None and card.status_code == 200 and card.text.strip().startswith("{"))
+    ctx = {
+        "page": page, "soup": soup, "raw_html": page.text, "full_text": full.get_text(" ", strip=True),
+        "base": base, "final_url": final_url, "title": title, "topic": topic, "brand": brand,
+        "meta_desc": meta_desc, "paragraphs": paragraphs, "wc": wc, "jsonld": jsonld,
+        "ld_errors": ld_errors, "robots_text": robots.text if robots is not None and robots.status_code == 200 else "",
+        "robots_groups": groups, "agent_card": card_ok,
+    }
+    checks += extras.tech_checks(ctx)
+    checks += extras.agent_checks(ctx)
+    is_store, platform, prods = extras.detect_store(ctx)
+    if is_store:
+        checks += extras.commerce_checks(ctx, prods, platform)
+    checks += extras.ux_checks(ctx)
+
+    pillars = ["seo", "aeo", "geo", "agent", "ux"] + (["commerce"] if is_store else [])
+    scores = {k: score(checks, k) for k in pillars}
+    scores["overall"] = round(sum(scores.values()) / len(pillars))
     return {
         "url": final_url,
         "title": title,
+        "pillars": pillars,
+        "store": {"detected": is_store, "platform": platform},
         "scores": scores,
         "checks": checks,
         "summary": {
@@ -493,5 +525,6 @@ async def audit(raw_url: str) -> dict:
             "warn": sum(c["status"] == "warn" for c in checks),
             "fail": sum(c["status"] == "fail" for c in checks),
         },
-        "notes": "Rule-based audit of the initial HTML. JavaScript-rendered content and Core Web Vitals are not measured.",
+        "notes": "Rule-based audit of the initial HTML. Not measured: JavaScript-rendered content, Core Web Vitals, "
+                 "off-page SEO (backlinks, brand mentions) and real conversion data (analytics).",
     }
